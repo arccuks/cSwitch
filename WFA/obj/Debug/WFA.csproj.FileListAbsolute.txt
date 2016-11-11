@@ -1,0 +1,9 @@
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\bin\Debug\WFA.exe.config
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\bin\Debug\WFA.exe
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\bin\Debug\WFA.pdb
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.aplicationForm.resources
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.Properties.Resources.resources
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.csproj.GenerateResource.Cache
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.exe
+c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.pdb
+C:\Users\avitoli2\Documents\Visual Studio 2012\Projects\WFA\WFA\obj\Debug\WFA.csprojResolveAssemblyReference.cache
