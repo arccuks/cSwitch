@@ -28,28 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.networkConnectionTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.dataGridViewNetworkAdapter = new System.Windows.Forms.DataGridView();
+            this.button1 = new System.Windows.Forms.Button();
             this.proxyGroupBox = new System.Windows.Forms.GroupBox();
             this.proxyButton = new System.Windows.Forms.Button();
             this.networkTypeGroupBox = new System.Windows.Forms.GroupBox();
             this.outerNetworkButton = new System.Windows.Forms.Button();
             this.innerNetworkButton = new System.Windows.Forms.Button();
             this.clearSelectionButton = new System.Windows.Forms.Button();
-            this.networkAdapterDataGridView = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.contextMenuStripTable = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.setAsInnerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setAsOuterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.innerNetworkStatusPanel = new System.Windows.Forms.Panel();
             this.innerNetworkStatusLabel = new System.Windows.Forms.Label();
             this.outerNetworkStatusLabel = new System.Windows.Forms.Label();
             this.outerNetworkStatusPanel = new System.Windows.Forms.Panel();
             this.proxyStatusLabel = new System.Windows.Forms.Label();
             this.proxyStatusPanel = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
             this.networkConnectionTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewNetworkAdapter)).BeginInit();
             this.proxyGroupBox.SuspendLayout();
             this.networkTypeGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.networkAdapterDataGridView)).BeginInit();
+            this.contextMenuStripTable.SuspendLayout();
             this.SuspendLayout();
             // 
             // networkConnectionTabControl
@@ -64,11 +69,11 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.dataGridViewNetworkAdapter);
             this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.proxyGroupBox);
             this.tabPage1.Controls.Add(this.networkTypeGroupBox);
             this.tabPage1.Controls.Add(this.clearSelectionButton);
-            this.tabPage1.Controls.Add(this.networkAdapterDataGridView);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -77,12 +82,36 @@
             this.tabPage1.Text = "Network Connection";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // dataGridViewNetworkAdapter
+            // 
+            this.dataGridViewNetworkAdapter.AllowUserToAddRows = false;
+            this.dataGridViewNetworkAdapter.AllowUserToDeleteRows = false;
+            this.dataGridViewNetworkAdapter.AllowUserToOrderColumns = true;
+            this.dataGridViewNetworkAdapter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewNetworkAdapter.ContextMenuStrip = this.contextMenuStripTable;
+            this.dataGridViewNetworkAdapter.Location = new System.Drawing.Point(6, 120);
+            this.dataGridViewNetworkAdapter.Name = "dataGridViewNetworkAdapter";
+            this.dataGridViewNetworkAdapter.ReadOnly = true;
+            this.dataGridViewNetworkAdapter.Size = new System.Drawing.Size(667, 353);
+            this.dataGridViewNetworkAdapter.TabIndex = 5;
+            this.dataGridViewNetworkAdapter.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.networkAdapterDataGridView_CellContextMenuStripNeeded);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(499, 54);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // proxyGroupBox
             // 
             this.proxyGroupBox.Controls.Add(this.proxyButton);
             this.proxyGroupBox.Location = new System.Drawing.Point(210, 6);
             this.proxyGroupBox.Name = "proxyGroupBox";
-            this.proxyGroupBox.Size = new System.Drawing.Size(197, 110);
+            this.proxyGroupBox.Size = new System.Drawing.Size(197, 108);
             this.proxyGroupBox.TabIndex = 3;
             this.proxyGroupBox.TabStop = false;
             this.proxyGroupBox.Text = "Proxy:";
@@ -142,14 +171,6 @@
             this.clearSelectionButton.UseVisualStyleBackColor = true;
             this.clearSelectionButton.Click += new System.EventHandler(this.clearSelectionButton_Click);
             // 
-            // networkAdapterDataGridView
-            // 
-            this.networkAdapterDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.networkAdapterDataGridView.Location = new System.Drawing.Point(3, 120);
-            this.networkAdapterDataGridView.Name = "networkAdapterDataGridView";
-            this.networkAdapterDataGridView.Size = new System.Drawing.Size(671, 353);
-            this.networkAdapterDataGridView.TabIndex = 0;
-            // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -159,6 +180,28 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // contextMenuStripTable
+            // 
+            this.contextMenuStripTable.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setAsInnerToolStripMenuItem,
+            this.setAsOuterToolStripMenuItem});
+            this.contextMenuStripTable.Name = "contextMenuStripTable";
+            this.contextMenuStripTable.Size = new System.Drawing.Size(181, 70);
+            // 
+            // setAsInnerToolStripMenuItem
+            // 
+            this.setAsInnerToolStripMenuItem.Name = "setAsInnerToolStripMenuItem";
+            this.setAsInnerToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.setAsInnerToolStripMenuItem.Text = "Set as Inner";
+            this.setAsInnerToolStripMenuItem.Click += new System.EventHandler(this.setAsInnerToolStripMenuItem_Click);
+            // 
+            // setAsOuterToolStripMenuItem
+            // 
+            this.setAsOuterToolStripMenuItem.Name = "setAsOuterToolStripMenuItem";
+            this.setAsOuterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setAsOuterToolStripMenuItem.Text = "Set as Outer";
+            this.setAsOuterToolStripMenuItem.Click += new System.EventHandler(this.setAsOuterToolStripMenuItem_Click);
             // 
             // innerNetworkStatusPanel
             // 
@@ -212,16 +255,6 @@
             this.proxyStatusPanel.Size = new System.Drawing.Size(109, 21);
             this.proxyStatusPanel.TabIndex = 3;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(499, 54);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // aplicationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -240,9 +273,10 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.networkConnectionTabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewNetworkAdapter)).EndInit();
             this.proxyGroupBox.ResumeLayout(false);
             this.networkTypeGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.networkAdapterDataGridView)).EndInit();
+            this.contextMenuStripTable.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -252,7 +286,6 @@
 
         private System.Windows.Forms.TabControl networkConnectionTabControl;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.DataGridView networkAdapterDataGridView;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button clearSelectionButton;
         private System.Windows.Forms.GroupBox networkTypeGroupBox;
@@ -267,6 +300,10 @@
         private System.Windows.Forms.GroupBox proxyGroupBox;
         private System.Windows.Forms.Button proxyButton;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripTable;
+        private System.Windows.Forms.ToolStripMenuItem setAsInnerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setAsOuterToolStripMenuItem;
+        private System.Windows.Forms.DataGridView dataGridViewNetworkAdapter;
     }
 }
 

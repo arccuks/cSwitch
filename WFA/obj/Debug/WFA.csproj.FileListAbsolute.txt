@@ -7,3 +7,13 @@ c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.cs
 c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.exe
 c:\users\avitoli2\documents\visual studio 2012\Projects\WFA\WFA\obj\Debug\WFA.pdb
 C:\Users\avitoli2\Documents\Visual Studio 2012\Projects\WFA\WFA\obj\Debug\WFA.csprojResolveAssemblyReference.cache
+C:\Git\cSwitch\WFA\bin\Debug\WFA.exe.config
+C:\Git\cSwitch\WFA\bin\Debug\WFA.exe
+C:\Git\cSwitch\WFA\bin\Debug\WFA.pdb
+C:\Git\cSwitch\WFA\obj\Debug\WFA.csprojResolveAssemblyReference.cache
+C:\Git\cSwitch\WFA\obj\Debug\WFA.aplicationForm.resources
+C:\Git\cSwitch\WFA\obj\Debug\WFA.Properties.Resources.resources
+C:\Git\cSwitch\WFA\obj\Debug\WFA.csproj.GenerateResource.cache
+C:\Git\cSwitch\WFA\obj\Debug\WFA.csproj.CoreCompileInputs.cache
+C:\Git\cSwitch\WFA\obj\Debug\WFA.exe
+C:\Git\cSwitch\WFA\obj\Debug\WFA.pdb
