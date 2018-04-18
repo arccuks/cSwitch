@@ -8,7 +8,7 @@ namespace WFA
 {
     public class NetworkAdapter : IEquatable<NetworkAdapter>
     {
-        public NetworkAdapter(string index, string name, string netConnectionID, bool netEnabled)
+        public NetworkAdapter(int index, string name, string netConnectionID, bool netEnabled)
         {
             Name = name;
             Index = index;
@@ -16,10 +16,35 @@ namespace WFA
             NetEnabled = netEnabled;
         }
 
-        public string Index { get; set; }
+        public static int InnerAdapterIndex { get; set; }
+        public static bool InnerAdapterEnabled { get; set; }
+        public static int OuterAdapterIndex { get; set; }
+        public static bool OuterAdapterEnabled { get; set; }
+
+
+        public int Index { get; set; }
         public string Name { get; set; }
         public string NetConnectionID { get; set; }
         public bool NetEnabled { get; set; }
+        public string Status
+        {
+            get
+            {
+                if (Index.Equals(InnerAdapterIndex) && Index.Equals(OuterAdapterIndex))
+                {
+                    return "Inner - Outer";
+                }
+                if (Index.Equals(InnerAdapterIndex))
+                {
+                    return "Inner";
+                }
+                if (Index.Equals(OuterAdapterIndex))
+                {
+                    return "Outer";
+                }
+                return null;
+            }
+        }
 
         public override string ToString()
         {
@@ -34,7 +59,7 @@ namespace WFA
         }
         public override int GetHashCode()
         {
-            return int.Parse(Index);
+            return Index;
         }
 
         public bool Equals(NetworkAdapter other)

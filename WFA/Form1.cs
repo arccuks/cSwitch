@@ -17,18 +17,11 @@ namespace WFA
 {
     public partial class aplicationForm : Form
     {
-        private BindingList<NetworkAdapter> netAdapterList;
-        private BindingSource source;
+        private BindingList<NetworkAdapter> netAdapterList { get; set; }
+        private BindingSource source { get; set; }
         private bool runThread { get; set; } = true;
-        private bool InnerAdapterEnabled { get; set; } = false;
-        private bool OuterAdapterEnabled { get; set; } = false;
         private bool ProxyEnabled { get; set; } = false;
 
-        private string InnerAdapterIndex { get; set; } = "7";
-        private string OuterAdapterIndex { get; set; } = "11";
-
-        private string[] COLUMN_HEADERS = { "Index", "NIC - Name", "Adapter Name", "Status" };
-        //private string[] _columnHeaders = {"Indeks", "NIC - nosaukums", "Adaptera nosaukums", "Status"};
 
         private string PROXY_REG_KEY_NAME => "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
         private string PROXY_REG_VALUE_NAME => "ProxyEnable";
@@ -49,7 +42,7 @@ namespace WFA
             netAdapterList = new BindingList<NetworkAdapter>();
             netAdapterList.ListChanged += new ListChangedEventHandler(eventAdapterListChanged);
             source = new BindingSource(netAdapterList, null);
-            
+            dataGridViewNetworkAdapter.DataSource = source;
 
             setNetworkAdapterInfo();
 
@@ -82,16 +75,16 @@ namespace WFA
         #region adapterDataGridView Functions
         // Initialize grid view for 1st time
         public void initNetAdapterGridView()
-        {
-            dataGridViewNetworkAdapter.DataSource = source;
+        {    
             // Fill GridView with data
             updateNetAdapterGridView();
 
             // Setting DataGridView width
-            this.dataGridViewNetworkAdapter.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.dataGridViewNetworkAdapter.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewNetworkAdapter.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.dataGridViewNetworkAdapter.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            dataGridViewNetworkAdapter.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            dataGridViewNetworkAdapter.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewNetworkAdapter.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            dataGridViewNetworkAdapter.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            dataGridViewNetworkAdapter.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
         }
 
         //Refresh info about adapter GridView
@@ -123,43 +116,22 @@ namespace WFA
         // Inits App.config file
         private void loadAppConfig()
         {
-            if (String.IsNullOrEmpty(ConfigurationManager.AppSettings["innerAdapterIndex"]))
-                throw new NullReferenceException("ERROR at: app.config \n\tinnerAdapterIndex must be filled!");
-            InnerAdapterIndex = ConfigurationManager.AppSettings["innerAdapterIndex"];
-
-            if (String.IsNullOrEmpty(ConfigurationManager.AppSettings["outerAdapterIndex"]))
-                throw new NullReferenceException("ERROR at: app.config \n\touterAdapterIndex must be filled!");
-            OuterAdapterIndex = ConfigurationManager.AppSettings["outerAdapterIndex"];
+            NetworkAdapter.InnerAdapterIndex = int.Parse(AppSettings.readAppSetting("innerAdapterIndex"));
+            NetworkAdapter.OuterAdapterIndex = int.Parse(AppSettings.readAppSetting("outerAdapterIndex"));
+            checkBoxHideVirtualAdapter.Checked = bool.Parse(AppSettings.readAppSetting("hideVirtualNetworkAdapters"));
         }
 
-        // Save App.config file
-        private void saveAppConfig()
+        private void setInnerAdapterIndex(int index)
         {
-            setInnerAdapterIndex("11");
-            InnerAdapterIndex = "11";
-            setOuterAdapterIndex("20");
-            OuterAdapterIndex = "20";
+            AppSettings.setAppSettingValue("innerAdapterIndex", index.ToString());
         }
 
-        private void setInnerAdapterIndex(string index)
+        private void setOuterAdapterIndex(int index)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-            config.AppSettings.Settings["innerAdapterIndex"].Value = index;
-
-            config.Save();
-
-            ConfigurationManager.RefreshSection("appSettings");
+            AppSettings.setAppSettingValue("outerAdapterIndex", index.ToString());
         }
 
-        private void setOuterAdapterIndex(string index)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-            config.AppSettings.Settings["outerAdapterIndex"].Value = index;
-
-            config.Save();
-
-            ConfigurationManager.RefreshSection("appSettings");
-        }
+            
 
         // Inits Network Status compoenets
         private void initNetworkStatusComponents()
@@ -250,8 +222,6 @@ namespace WFA
             //setting array
             string[][] splitedNetworkArray = new string[c][];
 
-            //netAdapterList.Clear();
-
             for (int i = 1; i < fullLine.Length; i++)
             {
                 int idx = i - 1;
@@ -259,7 +229,23 @@ namespace WFA
                 splitedNetworkArray[idx] = fullLine[i].Trim().Split(new string[] { "  " }, StringSplitOptions.None);
                 if (splitedNetworkArray[idx].Length == 4)
                 {
-                    NetworkAdapter na = new NetworkAdapter(splitedNetworkArray[idx][0], splitedNetworkArray[idx][1], splitedNetworkArray[idx][2], bool.Parse(splitedNetworkArray[idx][3]));
+                    NetworkAdapter na = new NetworkAdapter(int.Parse(splitedNetworkArray[idx][0]), splitedNetworkArray[idx][1], splitedNetworkArray[idx][2], bool.Parse(splitedNetworkArray[idx][3]));
+
+                    if (netAdapterList.Contains(na))
+                    {
+                        int index = netAdapterList.IndexOf(na);
+                        NetworkAdapter na2 = netAdapterList.ElementAt(index);
+                        na2.NetEnabled = na.NetEnabled;
+                    }
+                    else
+                    {
+                        netAdapterList.Add(na);
+                    }
+                }
+
+                if (splitedNetworkArray[idx].Length == 2 && !checkBoxHideVirtualAdapter.Checked)
+                {
+                    NetworkAdapter na = new NetworkAdapter(int.Parse(splitedNetworkArray[idx][0]), splitedNetworkArray[idx][1], null, false);
 
                     if (netAdapterList.Contains(na))
                     {
@@ -297,9 +283,9 @@ namespace WFA
                 foreach (NetworkAdapter na in netAdapterList)
                 {
                     // Inner network started
-                    if (na.Index.Equals(InnerAdapterIndex) && na.NetEnabled.Equals(true) && !InnerAdapterEnabled)
+                    if (na.Index.Equals(NetworkAdapter.InnerAdapterIndex) && na.NetEnabled.Equals(true) && !NetworkAdapter.InnerAdapterEnabled)
                     {
-                        InnerAdapterEnabled = true;
+                        NetworkAdapter.InnerAdapterEnabled = true;
                         Console.WriteLine("INNER ENABLED..");
                         updateNetAdapterGridView();
                         innerNetworkStatusPanel.BackColor = Color.Green;
@@ -307,9 +293,9 @@ namespace WFA
                     }
 
                     // Inner network shutdown
-                    if (na.Index.Equals(InnerAdapterIndex) && na.NetEnabled.Equals(false) && InnerAdapterEnabled)
+                    if (na.Index.Equals(NetworkAdapter.InnerAdapterIndex) && na.NetEnabled.Equals(false) && NetworkAdapter.InnerAdapterEnabled)
                     {
-                        InnerAdapterEnabled = false;
+                        NetworkAdapter.InnerAdapterEnabled = false;
                         Console.WriteLine("INNER DISABLED..");
                         updateNetAdapterGridView();
                         innerNetworkStatusPanel.BackColor = Color.Red;
@@ -317,9 +303,9 @@ namespace WFA
                     }
 
                     // Outer network started
-                    if (na.Index.Equals(OuterAdapterIndex) && na.NetEnabled.Equals(true) && !OuterAdapterEnabled)
+                    if (na.Index.Equals(NetworkAdapter.OuterAdapterIndex) && na.NetEnabled.Equals(true) && !NetworkAdapter.OuterAdapterEnabled)
                     {
-                        OuterAdapterEnabled = true;
+                        NetworkAdapter.OuterAdapterEnabled = true;
                         Console.WriteLine("OUTER ENABLED..");
                         updateNetAdapterGridView();
                         outerNetworkStatusPanel.BackColor = Color.Green;
@@ -327,9 +313,9 @@ namespace WFA
                     }
 
                     // Outer network shutdown
-                    if (na.Index.Equals(OuterAdapterIndex) && na.NetEnabled.Equals(false) && OuterAdapterEnabled)
+                    if (na.Index.Equals(NetworkAdapter.OuterAdapterIndex) && na.NetEnabled.Equals(false) && NetworkAdapter.OuterAdapterEnabled)
                     {
-                        OuterAdapterEnabled = false;
+                        NetworkAdapter.OuterAdapterEnabled = false;
                         Console.WriteLine("OUTER DISABLED..");
                         updateNetAdapterGridView();
                         outerNetworkStatusPanel.BackColor = Color.Red;
@@ -373,7 +359,8 @@ namespace WFA
         // Refresh table information
         private void clearSelectionButton_Click(object sender, EventArgs e)
         {
-            updateNetAdapterGridView();
+            netAdapterList.Clear();
+            initNetAdapterGridView();
         }
 
         // Stop background threads
@@ -382,17 +369,22 @@ namespace WFA
             this.runThread = false;
         }
 
+        private void disableNetworkAdapter(int index)
+        {
+            String cmd = "/c start wmic path win32_networkadapter where index=" + index + " call disable";
+            execCMD(cmd);
+        }
+
         // Enable/Disable Inner Netowrk
         private void innerNetworkButton_Click(object sender, EventArgs e)
         {
-            if (InnerAdapterEnabled)
+            if (NetworkAdapter.InnerAdapterEnabled)
             {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + InnerAdapterIndex + " call disable";
-                execCMD(cmd);
+                disableNetworkAdapter(NetworkAdapter.InnerAdapterIndex);
             }
             else
             {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + InnerAdapterIndex + " call enable";
+                String cmd = "/c start wmic path win32_networkadapter where index=" + NetworkAdapter.InnerAdapterIndex + " call enable";
                 execCMD(cmd);
             }
         }
@@ -400,14 +392,14 @@ namespace WFA
         // Enable/Disable Outer Netowrk
         private void outerNetworkButton_Click(object sender, EventArgs e)
         {
-            if (OuterAdapterEnabled)
+            if (NetworkAdapter.OuterAdapterEnabled)
             {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + OuterAdapterIndex + " call disable";
+                String cmd = "/c start wmic path win32_networkadapter where index=" + NetworkAdapter.OuterAdapterIndex + " call disable";
                 execCMD(cmd);
             }
             else
             {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + OuterAdapterIndex + " call enable";
+                String cmd = "/c start wmic path win32_networkadapter where index=" + NetworkAdapter.OuterAdapterIndex + " call enable";
                 execCMD(cmd);
             }
         }
@@ -429,18 +421,13 @@ namespace WFA
         }
         #endregion
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            saveAppConfig();
-            //loadAppConfig();
-        }
-
         private void setAsInnerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NetworkAdapter na = netAdapterList.ElementAt(int.Parse(contextMenuStripTable.Tag.ToString()));
             setInnerAdapterIndex(na.Index);
-            InnerAdapterIndex = na.Index;
-
+            NetworkAdapter.InnerAdapterIndex = na.Index;
+            netAdapterList.Clear();
+            initNetAdapterGridView();
         }
 
         private void networkAdapterDataGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
@@ -456,7 +443,19 @@ namespace WFA
         {
             NetworkAdapter na = netAdapterList.ElementAt(int.Parse(contextMenuStripTable.Tag.ToString()));
             setOuterAdapterIndex(na.Index);
-            OuterAdapterIndex = na.Index;
+            NetworkAdapter.OuterAdapterIndex = na.Index;
+            netAdapterList.Clear();
+            initNetAdapterGridView();
+        }
+
+        private void checkBoxHideVirtualAdapter_CheckedChanged(object sender, EventArgs e)
+        {
+            if(netAdapterList != null)
+            {
+                netAdapterList.Clear();
+                initNetAdapterGridView();
+                AppSettings.setAppSettingValue("hideVirtualNetworkAdapters", checkBoxHideVirtualAdapter.Checked.ToString());
+            }            
         }
     }
 }
