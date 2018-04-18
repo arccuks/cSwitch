@@ -67,5 +67,11 @@ namespace WFA
             if (other == null) return false;
             return (this.Index.Equals(other.Index));
         }
+
+        public static void enableNetworkAdapter(int index, bool enable)
+        {
+            String cmd = "/c start wmic path win32_networkadapter where index=" + index + " call " + (enable == true ? "enable" : "disable");
+            CommandLine.executeCommand(cmd);
+        }
     }
 }

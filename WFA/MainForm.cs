@@ -38,8 +38,8 @@ namespace WFA
             dataGridViewNetworkAdapter.DataSource = source;
 
             setNetworkAdapterInfo();
-
             initNetAdapterGridView();
+
             initNetworkStatusComponents();
 
             runRefresher();
@@ -83,7 +83,6 @@ namespace WFA
         //Refresh info about adapter GridView
         public void updateNetAdapterGridView()
         {
-            setNetworkAdapterInfo();
             setNetAdapterGridViewColors();
             dataGridViewNetworkAdapter.ClearSelection();
         }
@@ -142,22 +141,6 @@ namespace WFA
 
             outerNetworkButton.BackColor = Color.Black;
             outerNetworkButton.ForeColor = Color.Red;
-        }
-
-        // For Executing CMD comands
-        private void execCMD(string command, string filename = "CMD.exe")
-        {
-            Process p = new Process();
-            // Redirect the output stream of the child process.
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            p.StartInfo.FileName = filename;
-            p.StartInfo.Arguments = command;
-            p.Start();
-
-            //Process.Start("CMD.exe", command);
         }
 
         /// <summary>
@@ -266,6 +249,7 @@ namespace WFA
             while (runThread)
             {
                 setNetworkAdapterInfo();
+                updateNetAdapterGridView();
 
                 foreach (NetworkAdapter na in netAdapterList)
                 {
@@ -274,7 +258,6 @@ namespace WFA
                     {
                         NetworkAdapter.InnerAdapterEnabled = true;
                         Console.WriteLine("INNER ENABLED..");
-                        updateNetAdapterGridView();
                         innerNetworkStatusPanel.BackColor = Color.Green;
                         innerNetworkButton.ForeColor = Color.Green;
                     }
@@ -284,7 +267,6 @@ namespace WFA
                     {
                         NetworkAdapter.InnerAdapterEnabled = false;
                         Console.WriteLine("INNER DISABLED..");
-                        updateNetAdapterGridView();
                         innerNetworkStatusPanel.BackColor = Color.Red;
                         innerNetworkButton.ForeColor = Color.Red;
                     }
@@ -294,7 +276,6 @@ namespace WFA
                     {
                         NetworkAdapter.OuterAdapterEnabled = true;
                         Console.WriteLine("OUTER ENABLED..");
-                        updateNetAdapterGridView();
                         outerNetworkStatusPanel.BackColor = Color.Green;
                         outerNetworkButton.ForeColor = Color.Green;
                     }
@@ -304,7 +285,6 @@ namespace WFA
                     {
                         NetworkAdapter.OuterAdapterEnabled = false;
                         Console.WriteLine("OUTER DISABLED..");
-                        updateNetAdapterGridView();
                         outerNetworkStatusPanel.BackColor = Color.Red;
                         outerNetworkButton.ForeColor = Color.Red;
                     }
@@ -340,14 +320,13 @@ namespace WFA
         // Small tweak for better look
         private void Form1_Load(object sender, EventArgs e)
         {
-            //dataGridViewNetworkAdapter.ClearSelection();
+            dataGridViewNetworkAdapter.ClearSelection();
         }
 
         // Refresh table information
         private void clearSelectionButton_Click(object sender, EventArgs e)
         {
-            netAdapterList.Clear();
-            initNetAdapterGridView();
+            resetGridView();
         }
 
         // Stop background threads
@@ -356,46 +335,30 @@ namespace WFA
             this.runThread = false;
         }
 
-        private void disableNetworkAdapter(int index)
-        {
-            String cmd = "/c start wmic path win32_networkadapter where index=" + index + " call disable";
-            execCMD(cmd);
-        }
-
         // Enable/Disable Inner Netowrk
         private void innerNetworkButton_Click(object sender, EventArgs e)
         {
-            if (NetworkAdapter.InnerAdapterEnabled)
-            {
-                disableNetworkAdapter(NetworkAdapter.InnerAdapterIndex);
-            }
-            else
-            {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + NetworkAdapter.InnerAdapterIndex + " call enable";
-                execCMD(cmd);
-            }
+            NetworkAdapter.enableNetworkAdapter(NetworkAdapter.InnerAdapterIndex, !NetworkAdapter.InnerAdapterEnabled);
         }
 
         // Enable/Disable Outer Netowrk
         private void outerNetworkButton_Click(object sender, EventArgs e)
         {
-            if (NetworkAdapter.OuterAdapterEnabled)
-            {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + NetworkAdapter.OuterAdapterIndex + " call disable";
-                execCMD(cmd);
-            }
-            else
-            {
-                String cmd = "/c start wmic path win32_networkadapter where index=" + NetworkAdapter.OuterAdapterIndex + " call enable";
-                execCMD(cmd);
-            }
+            NetworkAdapter.enableNetworkAdapter(NetworkAdapter.OuterAdapterIndex, !NetworkAdapter.OuterAdapterEnabled);
+        }
+
+        private void resetGridView()
+        {
+            netAdapterList.Clear();
+            setNetworkAdapterInfo();
+            initNetAdapterGridView();
         }
 
         // Open Internet options
         private void proxyStatusLabel_Click(object sender, EventArgs e)
         {
             string cmd = "/c start inetcpl.cpl";
-            execCMD(cmd);
+            CommandLine.executeCommand(cmd);
         }
 
         // Enable/Disable Proxy
@@ -410,8 +373,7 @@ namespace WFA
             NetworkAdapter na = netAdapterList.ElementAt(int.Parse(contextMenuStripTable.Tag.ToString()));
             setInnerAdapterIndex(na.Index);
             NetworkAdapter.InnerAdapterIndex = na.Index;
-            netAdapterList.Clear();
-            initNetAdapterGridView();
+            resetGridView();
         }
 
         private void networkAdapterDataGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
@@ -428,16 +390,15 @@ namespace WFA
             NetworkAdapter na = netAdapterList.ElementAt(int.Parse(contextMenuStripTable.Tag.ToString()));
             setOuterAdapterIndex(na.Index);
             NetworkAdapter.OuterAdapterIndex = na.Index;
-            netAdapterList.Clear();
-            initNetAdapterGridView();
+            resetGridView();
+
         }
 
         private void checkBoxHideVirtualAdapter_CheckedChanged(object sender, EventArgs e)
         {
             if(netAdapterList != null)
             {
-                netAdapterList.Clear();
-                initNetAdapterGridView();
+                resetGridView();
                 AppSettings.setAppSettingValue("hideVirtualNetworkAdapters", checkBoxHideVirtualAdapter.Checked.ToString());
             }            
         }
