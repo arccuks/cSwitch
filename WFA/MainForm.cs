@@ -20,13 +20,6 @@ namespace WFA
         private BindingList<NetworkAdapter> netAdapterList { get; set; }
         private BindingSource source { get; set; }
         private bool runThread { get; set; } = true;
-        private bool ProxyEnabled { get; set; } = false;
-
-
-        private string PROXY_REG_KEY_NAME => "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
-        private string PROXY_REG_VALUE_NAME => "ProxyEnable";
-        private int PROXY_OFF => 0;
-        private int PROXY_ON => 1;
 
         delegate void setNetworkAdapterInfoCallback(object p, ListChangedEventArgs e);
 
@@ -149,12 +142,6 @@ namespace WFA
 
             outerNetworkButton.BackColor = Color.Black;
             outerNetworkButton.ForeColor = Color.Red;
-        }
-
-        // Returns proxy status from Windows Registry
-        private bool getProxyStatus()
-        {
-            return Registry.GetValue(PROXY_REG_KEY_NAME, PROXY_REG_VALUE_NAME, PROXY_OFF).ToString().Equals("1");
         }
 
         // For Executing CMD comands
@@ -332,15 +319,15 @@ namespace WFA
         {
             while (runThread)
             {
-                if (getProxyStatus() && !ProxyEnabled)
+                if (Proxy.getProxyStatus() && !Proxy.ProxyEnabled)
                 {
-                    ProxyEnabled = true;
+                    Proxy.ProxyEnabled = true;
                     proxyStatusPanel.BackColor = Color.Green;
                 }
 
-                if (!getProxyStatus() && ProxyEnabled)
+                if (!Proxy.getProxyStatus() && Proxy.ProxyEnabled)
                 {
-                    ProxyEnabled = false;
+                    Proxy.ProxyEnabled = false;
                     proxyStatusPanel.BackColor = Color.Red;
                 }
 
@@ -414,10 +401,7 @@ namespace WFA
         // Enable/Disable Proxy
         private void proxyButton_Click(object sender, EventArgs e)
         {
-            if (ProxyEnabled)
-                Registry.SetValue(PROXY_REG_KEY_NAME, PROXY_REG_VALUE_NAME, PROXY_OFF, RegistryValueKind.DWord);
-            else
-                Registry.SetValue(PROXY_REG_KEY_NAME, PROXY_REG_VALUE_NAME, PROXY_ON, RegistryValueKind.DWord);
+            Proxy.enableProxy(!Proxy.ProxyEnabled);
         }
         #endregion
 
