@@ -149,21 +149,7 @@ namespace WFA
         /// <param name="netAdapList"></param>
         private void setNetworkAdapterInfo()
         {
-            Process p = new Process();
-            // Redirect the output stream of the child process.
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            p.StartInfo.FileName = "wmic.exe";
-            p.StartInfo.Arguments = "nic get name, index, NetConnectionID, netenabled";
-            p.Start();
-            // Do not wait for the child process to exit before
-            // reading to the end of its redirected stream.
-            // p.WaitForExit();
-            // Read the output stream first and then wait.
-            string output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
+            string output = CommandLine.getCommandOutput("nic get name, index, NetConnectionID, netenabled", "wmic.exe");
 
             //splited wmic output with NEW_LINE to get array
             string[] fullLine = output.Split(new string[] { "\n" }, StringSplitOptions.None);
